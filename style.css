@@ -700,9 +700,103 @@ body {
     box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3);
 }
 
-.large-btn:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 30px rgba(79, 70, 229, 0.4);
+.large-btn.secondary {
+    background: var(--panel-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(10px);
+}
+
+.btn-group {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+#difficulty-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin: 30px 0;
+}
+
+.diff-btn {
+    padding: 15px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.diff-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+}
+
+.diff-btn.selected {
+    background: var(--accent-color);
+    color: white;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 15px rgba(79, 70, 229, 0.4);
+}
+
+.balance-panel {
+    max-width: 900px !important;
+    width: 90% !important;
+}
+
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    margin: 20px 0;
+}
+
+#balance-table {
+    width: 100%;
+    border-collapse: collapse;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+}
+
+#balance-table th,
+#balance-table td {
+    padding: 12px;
+    border-bottom: 1px solid var(--glass-border);
+    text-align: center;
+}
+
+#balance-table th {
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+#balance-table input {
+    width: 70px;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    border-radius: 4px;
+    color: white;
+    text-align: center;
+}
+
+.btn-group.horizontal {
+    flex-direction: row;
+    justify-content: center;
+}
+
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 2.5rem;
+    cursor: pointer;
 }
 
 .rotate-icon {

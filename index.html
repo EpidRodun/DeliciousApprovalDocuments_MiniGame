@@ -87,7 +87,55 @@
                 <div class="overlay-content glass-panel">
                     <h1>맛있는 승인 서류</h1>
                     <p>기준에 맞는 식품만 승인하세요!</p>
-                    <button id="btn-start" class="large-btn">게임 시작</button>
+                    <div class="btn-group">
+                        <button id="btn-start" class="large-btn">게임 시작</button>
+                        <button id="btn-difficulty" class="large-btn secondary">난이도 설정</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Overlay -->
+            <div id="settings-overlay" class="overlay">
+                <div class="overlay-content glass-panel">
+                    <h1>난이도 설정</h1>
+                    <div id="difficulty-options">
+                        <button class="diff-btn" data-level="very-easy">매우 쉬움</button>
+                        <button class="diff-btn" data-level="easy">쉬움</button>
+                        <button class="diff-btn" data-level="normal">보통</button>
+                        <button class="diff-btn" data-level="hard">어려움</button>
+                    </div>
+                    <div class="btn-group">
+                        <button id="btn-balance-tuning" class="large-btn secondary">밸런스 상세 조절</button>
+                        <button id="btn-save-settings" class="large-btn">저장 및 나가기</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Balance Overlay -->
+            <div id="balance-overlay" class="overlay">
+                <div class="overlay-content glass-panel balance-panel">
+                    <h1>밸런스 상세 조절</h1>
+                    <div class="table-container">
+                        <table id="balance-table">
+                            <thead>
+                                <tr>
+                                    <th>난이도</th>
+                                    <th>자연 소모</th>
+                                    <th>성공 회복</th>
+                                    <th>식빵 회복</th>
+                                    <th>실패 차감</th>
+                                </tr>
+                            </thead>
+                            <tbody id="balance-table-body">
+                                <!-- Dynamically populated -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="btn-group horizontal">
+                        <button id="btn-reset-balance" class="large-btn secondary">기본값 초기화</button>
+                        <button id="btn-save-balance" class="large-btn">저장</button>
+                    </div>
+                    <button id="btn-close-balance" class="close-btn">×</button>
                 </div>
             </div>
 

@@ -32,10 +32,32 @@ const btnApprove = document.getElementById('btn-approve');
 const btnSwap = document.getElementById('btn-swap');
 const btnPause = document.getElementById('btn-pause');
 const btnResume = document.getElementById('btn-resume');
+const btnDifficulty = document.getElementById('btn-difficulty');
+const settingsOverlay = document.getElementById('settings-overlay');
+const btnSaveSettings = document.getElementById('btn-save-settings');
+const difficultyButtons = document.querySelectorAll('.diff-btn');
+
+const btnBalanceTuning = document.getElementById('btn-balance-tuning');
+const balanceOverlay = document.getElementById('balance-overlay');
+const balanceTableBody = document.getElementById('balance-table-body');
+const btnSaveBalance = document.getElementById('btn-save-balance');
+const btnResetBalance = document.getElementById('btn-reset-balance');
+const btnCloseBalance = document.getElementById('btn-close-balance');
+
+const DEFAULT_DIFFICULTY_CONFIG = {
+    'very-easy': { decay: 0.1, recover: 10, recoverBread: 20, penalty: 5, label: '매우 쉬움' },
+    'easy': { decay: 0.15, recover: 6, recoverBread: 15, penalty: 10, label: '쉬움' },
+    'normal': { decay: 0.2, recover: 3, recoverBread: 10, penalty: 15, label: '보통' },
+    'hard': { decay: 0.3, recover: 1, recoverBread: 5, penalty: 25, label: '어려움' }
+};
+
+let DIFFICULTY_CONFIG = JSON.parse(localStorage.getItem('customDifficultyConfig')) || { ...DEFAULT_DIFFICULTY_CONFIG };
+
+let currentDifficulty = localStorage.getItem('gameDifficulty') || 'normal';
 
 let itemElements = []; // Store DOM elements of the queue
 
-// Scaling Logic
+// Scaling Logic... [skipped for brevity, but I will include the full chunk below]
 const gameWrapper = document.getElementById('game-wrapper');
 const referenceWidth = 1280;
 const referenceHeight = 720;
@@ -54,6 +76,72 @@ function resizeGame() {
 window.addEventListener('resize', resizeGame);
 window.addEventListener('load', resizeGame);
 resizeGame();
+
+// Difficulty UI Logic
+btnDifficulty.addEventListener('click', () => {
+    difficultyButtons.forEach(btn => {
+        btn.classList.toggle('selected', btn.dataset.level === currentDifficulty);
+    });
+    settingsOverlay.classList.add('active');
+});
+
+difficultyButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+        currentDifficulty = btn.dataset.level;
+        difficultyButtons.forEach(b => b.classList.toggle('selected', b === btn));
+    });
+});
+
+btnSaveSettings.addEventListener('click', () => {
+    localStorage.setItem('gameDifficulty', currentDifficulty);
+    settingsOverlay.classList.remove('active');
+});
+
+// Balance Tuning Logic
+btnBalanceTuning.addEventListener('click', () => {
+    populateBalanceTable();
+    balanceOverlay.classList.add('active');
+});
+
+function populateBalanceTable() {
+    balanceTableBody.innerHTML = '';
+    const levels = ['very-easy', 'easy', 'normal', 'hard'];
+    levels.forEach(level => {
+        const config = DIFFICULTY_CONFIG[level];
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${config.label}</td>
+            <td><input type="number" step="0.01" data-level="${level}" data-prop="decay" value="${config.decay}"></td>
+            <td><input type="number" data-level="${level}" data-prop="recover" value="${config.recover}"></td>
+            <td><input type="number" data-level="${level}" data-prop="recoverBread" value="${config.recoverBread}"></td>
+            <td><input type="number" data-level="${level}" data-prop="penalty" value="${config.penalty}"></td>
+        `;
+        balanceTableBody.appendChild(row);
+    });
+}
+
+btnSaveBalance.addEventListener('click', () => {
+    const inputs = balanceTableBody.querySelectorAll('input');
+    inputs.forEach(input => {
+        const { level, prop } = input.dataset;
+        DIFFICULTY_CONFIG[level][prop] = parseFloat(input.value);
+    });
+    localStorage.setItem('customDifficultyConfig', JSON.stringify(DIFFICULTY_CONFIG));
+    alert('밸런스 설정이 저장되었습니다.');
+    balanceOverlay.classList.remove('active');
+});
+
+btnResetBalance.addEventListener('click', () => {
+    if (confirm('모든 수치를 기본값으로 초기화하시겠습니까?')) {
+        DIFFICULTY_CONFIG = JSON.parse(JSON.stringify(DEFAULT_DIFFICULTY_CONFIG));
+        localStorage.removeItem('customDifficultyConfig');
+        populateBalanceTable();
+    }
+});
+
+btnCloseBalance.addEventListener('click', () => {
+    balanceOverlay.classList.remove('active');
+});
 
 // Initial Setup
 // Aggressive Zoom Prevention for Mobile
@@ -157,7 +245,8 @@ function startGame() {
 
         if (gameState.isPaused) return;
 
-        const speed = 0.2 + (gameState.score / 150000);
+        const config = DIFFICULTY_CONFIG[currentDifficulty];
+        const speed = config.decay + (gameState.score / 150000);
         gameState.time -= speed;
 
         if (gameState.time <= 0) endGame();
@@ -286,8 +375,9 @@ function handleApprove() {
             }
         }
 
-        if (result === 'success_both') gameState.time = Math.min(100, gameState.time + 10);
-        else gameState.time = Math.min(100, gameState.time + 3);
+        const config = DIFFICULTY_CONFIG[currentDifficulty];
+        if (result === 'success_both') gameState.time = Math.min(100, gameState.time + config.recoverBread);
+        else gameState.time = Math.min(100, gameState.time + config.recover);
 
         // Combo animation
         comboText.classList.remove('combo-animate');
@@ -303,8 +393,9 @@ function handleApprove() {
     } else {
         // Wrong Action
         triggerFlash('flash-wrong');
+        const config = DIFFICULTY_CONFIG[currentDifficulty];
         gameState.combo = 0;
-        gameState.time -= 15;
+        gameState.time -= config.penalty;
         // Visual shake for container or camera
         activeEl.classList.add('item-tear');
     }
