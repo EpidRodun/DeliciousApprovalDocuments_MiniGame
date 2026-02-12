@@ -35,6 +35,26 @@ const btnResume = document.getElementById('btn-resume');
 
 let itemElements = []; // Store DOM elements of the queue
 
+// Scaling Logic
+const gameWrapper = document.getElementById('game-wrapper');
+const referenceWidth = 1280;
+const referenceHeight = 720;
+
+function resizeGame() {
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+
+    const scaleX = windowWidth / referenceWidth;
+    const scaleY = windowHeight / referenceHeight;
+    const scale = Math.min(scaleX, scaleY);
+
+    gameWrapper.style.transform = `scale(${scale})`;
+}
+
+window.addEventListener('resize', resizeGame);
+window.addEventListener('load', resizeGame);
+resizeGame();
+
 // Initial Setup
 btnStart.addEventListener('click', startGame);
 btnApprove.addEventListener('click', () => {
