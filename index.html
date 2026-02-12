@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>맛있는 승인 서류 - Delicious Approval Documents</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts: Inter & Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Outfit:wght@500;800&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div id="game-container">
+        <!-- UI Elements -->
+        <div class="ui-layer">
+            <!-- Left Top: Combo & Score -->
+            <div id="left-ui-group">
+                <div id="combo-container" class="glass-panel">
+                    <span class="label">COMBO</span>
+                    <span id="combo-text">0</span>
+                </div>
+                <div id="score-container" class="glass-panel">
+                    <span class="label">SCORE</span>
+                    <span id="score-text">000,000</span>
+                </div>
+            </div>
+
+            <!-- Center Top: Status (Gauges & Icons) -->
+            <div id="status-center">
+                <div id="gauge-container">
+                    <div class="gauge-wrapper">
+                        <div id="timer-gauge-bg" class="gauge-bg">
+                            <div id="timer-gauge-fill" class="gauge-fill"></div>
+                        </div>
+                    </div>
+                    <div class="gauge-wrapper">
+                        <div id="fever-gauge-bg" class="gauge-bg">
+                            <div id="fever-gauge-fill" class="gauge-fill"></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="inspector-top" class="glass-panel">
+                    <div class="status-icon active" id="icon-yes">✅</div>
+                    <div class="status-icon" id="icon-no">❌</div>
+                </div>
+            </div>
+
+            <!-- Right Top: Pause -->
+            <div id="right-ui-container">
+                <button id="btn-pause" class="glass-panel icon-btn">⏸️</button>
+            </div>
+        </div>
+
+        <!-- Background Flash Layer -->
+        <div id="flash-overlay"></div>
+
+        <!-- Main Interaction Area -->
+        <main id="interaction-area">
+            <div id="document-stage">
+                <!-- 5 items will be managed inside this queue -->
+                <div id="item-queue"></div>
+            </div>
+
+            <!-- Paper Stack Area (Right Side) -->
+            <div id="paper-stack"></div>
+        </main>
+
+        <!-- Controls -->
+        <footer id="controls">
+            <button id="btn-swap" class="game-btn swap">
+                교체
+                <span class="shortcut-hint">A</span>
+            </button>
+            <button id="btn-approve" class="game-btn approve">
+                승인
+                <span class="shortcut-hint">S</span>
+            </button>
+        </footer>
+
+        <!-- Start Overlay -->
+        <div id="start-overlay" class="overlay active">
+            <div class="overlay-content glass-panel">
+                <h1>맛있는 승인 서류</h1>
+                <p>기준에 맞는 식품만 승인하세요!</p>
+                <button id="btn-start" class="large-btn">게임 시작</button>
+            </div>
+        </div>
+
+        <!-- Pause Overlay -->
+        <div id="pause-overlay" class="overlay">
+            <div class="overlay-content glass-panel">
+                <h1>일시정지</h1>
+                <p>잠시 숨을 고르세요.</p>
+                <button id="btn-resume" class="large-btn">계속하기</button>
+            </div>
+        </div>
+
+        <!-- Orientation Overlay -->
+        <div id="orientation-overlay" class="overlay">
+            <div class="overlay-content glass-panel">
+                <div class="rotate-icon">🔄</div>
+                <h1>가로 화면 권장</h1>
+                <p>더 나은 게임 경험을 위해 기기를 가로로 회전해주세요.</p>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>
