@@ -56,6 +56,24 @@ window.addEventListener('load', resizeGame);
 resizeGame();
 
 // Initial Setup
+// Aggressive Zoom Prevention for Mobile
+if ('ontouchstart' in window) {
+    document.addEventListener('touchstart', (e) => {
+        if (e.touches.length > 1) {
+            e.preventDefault();
+        }
+    }, { passive: false });
+
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', (e) => {
+        const now = (new Date()).getTime();
+        if (now - lastTouchEnd <= 300) {
+            e.preventDefault();
+        }
+        lastTouchEnd = now;
+    }, { passive: false });
+}
+
 btnStart.addEventListener('click', startGame);
 btnApprove.addEventListener('click', () => {
     if (gameState.isPaused) return;
