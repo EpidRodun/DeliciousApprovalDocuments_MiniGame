@@ -66,8 +66,11 @@ function resizeGame() {
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
 
-    const scaleX = windowWidth / referenceWidth;
-    const scaleY = windowHeight / referenceHeight;
+    // Aggressive safety margin (15%) to ensure buttons are never cut off by 
+    // mobile browser bars or "safe area" obstructions.
+    const safetyMargin = 0.85;
+    const scaleX = (windowWidth * safetyMargin) / referenceWidth;
+    const scaleY = (windowHeight * safetyMargin) / referenceHeight;
     const scale = Math.min(scaleX, scaleY);
 
     gameWrapper.style.transform = `scale(${scale})`;
