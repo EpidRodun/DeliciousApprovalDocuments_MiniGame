@@ -230,7 +230,6 @@ function handleApprove() {
         else if (item.type === 'no') result = 'fail';
         else if (item.type === 'bread') {
             result = 'success_both';
-            specialAction = 'eat';
         }
     } else { // status === 'no'
         if (item.type === 'yes') result = 'fail';
@@ -239,9 +238,15 @@ function handleApprove() {
     }
 
     if (result === 'none') {
+        if (item.type === 'bread') {
+            activeEl.classList.add('item-tear');
+            gameState.isProcessing = true;
+            setTimeout(shiftQueue, 400); // Wait for tear animation
+            return;
+        }
         activeEl.classList.add('doc-reject');
         gameState.isProcessing = true;
-        setTimeout(shiftQueue, 150);
+        setTimeout(shiftQueue, 50); // Synchronized move-in
         return;
     }
 
@@ -271,8 +276,8 @@ function handleApprove() {
         void comboText.offsetWidth;
         comboText.classList.add('combo-animate');
 
-        if (specialAction === 'eat') {
-            activeEl.classList.add('item-eat');
+        if (item.type === 'bread') {
+            activeEl.classList.add('doc-up');
         } else {
             activeEl.classList.add('doc-approve');
             addPaperToStack();
@@ -286,7 +291,7 @@ function handleApprove() {
         activeEl.classList.add('item-tear');
     }
 
-    setTimeout(shiftQueue, result.startsWith('success') ? 200 : 400);
+    setTimeout(shiftQueue, result.startsWith('success') ? 50 : 400);
 }
 
 function triggerFlash(className) {

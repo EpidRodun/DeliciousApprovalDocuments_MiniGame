@@ -247,16 +247,15 @@ body {
     top: 50%;
     background: #ffffff;
     color: #1e293b;
-    padding: 15px;
-    border-radius: 12px;
+    padding: 8px;
+    border-radius: 8px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 200px;
-    height: 140px;
-    /* Reduced by half from 280px */
+    width: 120px;
+    height: 84px;
     text-align: center;
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     overflow: hidden;
@@ -272,26 +271,25 @@ body {
 
 .item-display.pos-1 {
     z-index: 8;
-    transform: translate(-50%, -50%) translateX(250px);
-    /* 200px width + 50px margin */
+    transform: translate(-50%, -50%) translateX(140px);
     opacity: 0.9;
 }
 
 .item-display.pos-2 {
     z-index: 6;
-    transform: translate(-50%, -50%) translateX(500px);
+    transform: translate(-50%, -50%) translateX(280px);
     opacity: 0.8;
 }
 
 .item-display.pos-3 {
     z-index: 4;
-    transform: translate(-50%, -50%) translateX(750px);
+    transform: translate(-50%, -50%) translateX(420px);
     opacity: 0.7;
 }
 
 .item-display.pos-4 {
     z-index: 2;
-    transform: translate(-50%, -50%) translateX(1000px);
+    transform: translate(-50%, -50%) translateX(560px);
     opacity: 0.6;
 }
 
@@ -411,13 +409,13 @@ body {
 
 /* Item Visual/Label inside item-display */
 #item-visual {
-    font-size: 4rem;
-    margin-bottom: 10px;
+    font-size: 2.5rem;
+    margin-bottom: 2px;
 }
 
 #item-label {
     font-family: var(--font-heading);
-    font-size: 1.2rem;
+    font-size: 0.8rem;
     font-weight: 800;
     color: #334155;
 }
@@ -482,7 +480,7 @@ body {
     padding: 40px;
     display: flex;
     justify-content: center;
-    gap: 30px;
+    gap: 400px;
     background: rgba(245, 158, 11, 0.05);
     /* Subtle Amber Tint */
     border-top: 1px solid var(--glass-border);
@@ -575,13 +573,13 @@ body {
 
 @keyframes slide-in {
     from {
-        transform: translate(-50%, -50%) translateX(200%) rotate(10deg);
+        transform: translate(-50%, -50%) translateX(800px) rotate(10deg);
         opacity: 0;
     }
 
     to {
-        transform: translate(-50%, -50%) translateX(0) rotateX(5deg);
-        opacity: 1;
+        transform: translate(-50%, -50%) translateX(560px) rotateX(5deg);
+        opacity: 0.6;
     }
 }
 
@@ -597,6 +595,17 @@ body {
         transform: translate(-50%, -50%) translateX(-300%) rotate(-20deg);
         opacity: 0;
     }
+}
+
+@keyframes approved-up {
+    to {
+        transform: translate(-50%, -50%) translateY(-500px) rotate(10deg);
+        opacity: 0;
+    }
+}
+
+.doc-up {
+    animation: approved-up 0.5s ease-in forwards;
 }
 
 .doc-in {
