@@ -49,7 +49,7 @@ const adminPasswordInput = document.getElementById('admin-password');
 const btnConfirmPassword = document.getElementById('btn-confirm-password');
 const btnCancelPassword = document.getElementById('btn-cancel-password');
 
-const ADMIN_PASSWORD_URL = 'https://script.google.com/macros/s/AKfycbw9cKrsA_WDUSp6En_Q3KU14iIONAe3OihcEsAGOjWcwsaIxL_GE28se7PCYRO2S3_BIg/exec';
+const ADMIN_PASSWORD_URL = 'https://script.google.com/macros/s/AKfycbwu82VFDszdUWDf7-1iKxbTaZAEAJ8aOqU_6tso1fAxMYb_C1JsBwnP3CvfYdL_WO2N6g/exec';
 let ADMIN_PASSWORD = null; // Locked until fetched from remote
 
 async function fetchRemoteConfig() {
@@ -83,10 +83,10 @@ async function fetchRemoteConfig() {
 fetchRemoteConfig();
 
 const DEFAULT_DIFFICULTY_CONFIG = {
-    'very-easy': { decay: 0.1, recover: 10, recoverBread: 20, penalty: 5, label: '매우 쉬움' },
-    'easy': { decay: 0.15, recover: 6, recoverBread: 15, penalty: 10, label: '쉬움' },
-    'normal': { decay: 0.2, recover: 3, recoverBread: 10, penalty: 15, label: '보통' },
-    'hard': { decay: 0.3, recover: 1, recoverBread: 5, penalty: 25, label: '어려움' }
+    'very-easy': { decay: 0.1, recover: 10, recoverBread: 20, penalty: 5, label: '매우 쉬움', ratioYes: 45, ratioNo: 45, ratioBread: 10 },
+    'easy': { decay: 0.15, recover: 6, recoverBread: 15, penalty: 10, label: '쉬움', ratioYes: 42, ratioNo: 42, ratioBread: 16 },
+    'normal': { decay: 0.2, recover: 3, recoverBread: 10, penalty: 15, label: '보통', ratioYes: 40, ratioNo: 40, ratioBread: 20 },
+    'hard': { decay: 0.3, recover: 1, recoverBread: 5, penalty: 25, label: '어려움', ratioYes: 35, ratioNo: 35, ratioBread: 30 }
 };
 
 let DIFFICULTY_CONFIG = JSON.parse(localStorage.getItem('customDifficultyConfig')) || { ...DEFAULT_DIFFICULTY_CONFIG };
@@ -188,6 +188,9 @@ function populateBalanceTable() {
             <td><input type="number" data-level="${level}" data-prop="recover" value="${config.recover}"></td>
             <td><input type="number" data-level="${level}" data-prop="recoverBread" value="${config.recoverBread}"></td>
             <td><input type="number" data-level="${level}" data-prop="penalty" value="${config.penalty}"></td>
+            <td><input type="number" data-level="${level}" data-prop="ratioYes" value="${config.ratioYes}"></td>
+            <td><input type="number" data-level="${level}" data-prop="ratioNo" value="${config.ratioNo}"></td>
+            <td><input type="number" data-level="${level}" data-prop="ratioBread" value="${config.ratioBread}"></td>
         `;
         balanceTableBody.appendChild(row);
     });
@@ -368,12 +371,24 @@ function togglePause() {
 }
 
 function createRandomItem() {
+    const config = DIFFICULTY_CONFIG[currentDifficulty];
+    const totalRatio = config.ratioYes + config.ratioNo + config.ratioBread;
+    const rand = Math.random() * totalRatio;
+
     const types = [
-        { type: 'yes', label: "YES 서류", visual: "📑" },
-        { type: 'no', label: "NO 서류", visual: "📜" },
-        { type: 'bread', label: "식빵", visual: "🍞" }
+        { type: 'yes', label: "YES 서류", visual: "📑", ratio: config.ratioYes },
+        { type: 'no', label: "NO 서류", visual: "📜", ratio: config.ratioNo },
+        { type: 'bread', label: "식빵", visual: "🍞", ratio: config.ratioBread }
     ];
-    return types[Math.floor(Math.random() * types.length)];
+
+    let cumulative = 0;
+    for (const item of types) {
+        cumulative += item.ratio;
+        if (rand <= cumulative) {
+            return { type: item.type, label: item.label, visual: item.visual };
+        }
+    }
+    return types[0]; // Fallback
 }
 
 function createItemElement(item, index) {
