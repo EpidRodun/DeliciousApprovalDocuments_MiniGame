@@ -44,6 +44,44 @@ const btnSaveBalance = document.getElementById('btn-save-balance');
 const btnResetBalance = document.getElementById('btn-reset-balance');
 const btnCloseBalance = document.getElementById('btn-close-balance');
 
+const passwordOverlay = document.getElementById('password-overlay');
+const adminPasswordInput = document.getElementById('admin-password');
+const btnConfirmPassword = document.getElementById('btn-confirm-password');
+const btnCancelPassword = document.getElementById('btn-cancel-password');
+
+const ADMIN_PASSWORD_URL = 'https://script.google.com/macros/s/AKfycbw9cKrsA_WDUSp6En_Q3KU14iIONAe3OihcEsAGOjWcwsaIxL_GE28se7PCYRO2S3_BIg/exec';
+let ADMIN_PASSWORD = null; // Locked until fetched from remote
+
+async function fetchRemoteConfig() {
+    if (ADMIN_PASSWORD_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') return;
+    try {
+        const response = await fetch(ADMIN_PASSWORD_URL);
+        const data = await response.json();
+
+        // Update Password
+        if (data && data.password) {
+            ADMIN_PASSWORD = data.password.toString();
+        }
+
+        // Update Balance Config
+        if (data && data.config) {
+            // Merge remote values into current config while preserving labels
+            for (const level in data.config) {
+                if (DIFFICULTY_CONFIG[level]) {
+                    Object.assign(DIFFICULTY_CONFIG[level], data.config[level]);
+                }
+            }
+            // Optional: Backup to localStorage
+            localStorage.setItem('customDifficultyConfig', JSON.stringify(DIFFICULTY_CONFIG));
+        }
+    } catch (error) {
+        console.error("Failed to fetch remote config:", error);
+    }
+}
+
+// Initial fetch
+fetchRemoteConfig();
+
 const DEFAULT_DIFFICULTY_CONFIG = {
     'very-easy': { decay: 0.1, recover: 10, recoverBread: 20, penalty: 5, label: '매우 쉬움' },
     'easy': { decay: 0.15, recover: 6, recoverBread: 15, penalty: 10, label: '쉬움' },
@@ -102,8 +140,40 @@ btnSaveSettings.addEventListener('click', () => {
 
 // Balance Tuning Logic
 btnBalanceTuning.addEventListener('click', () => {
-    populateBalanceTable();
-    balanceOverlay.classList.add('active');
+    adminPasswordInput.value = '';
+    passwordOverlay.classList.add('active');
+    setTimeout(() => adminPasswordInput.focus(), 100);
+});
+
+btnCancelPassword.addEventListener('click', () => {
+    passwordOverlay.classList.remove('active');
+});
+
+btnConfirmPassword.addEventListener('click', async () => {
+    btnConfirmPassword.disabled = true;
+    btnConfirmPassword.textContent = '확인 중...';
+
+    // Refresh config right before check for real-time sync
+    await fetchRemoteConfig();
+
+    if (!ADMIN_PASSWORD) {
+        alert('서버로부터 보안 설정을 불러오지 못했습니다. 잠시 후 다시 시도하거나 URL 설정을 확인해주세요.');
+    } else if (adminPasswordInput.value === ADMIN_PASSWORD) {
+        passwordOverlay.classList.remove('active');
+        populateBalanceTable();
+        balanceOverlay.classList.add('active');
+    } else {
+        alert('비밀번호가 틀렸습니다!');
+        adminPasswordInput.value = '';
+        adminPasswordInput.focus();
+    }
+
+    btnConfirmPassword.disabled = false;
+    btnConfirmPassword.textContent = '확인';
+});
+
+adminPasswordInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') btnConfirmPassword.click();
 });
 
 function populateBalanceTable() {
@@ -123,14 +193,39 @@ function populateBalanceTable() {
     });
 }
 
-btnSaveBalance.addEventListener('click', () => {
+btnSaveBalance.addEventListener('click', async () => {
+    btnSaveBalance.disabled = true;
+    btnSaveBalance.textContent = '저장 중...';
+
     const inputs = balanceTableBody.querySelectorAll('input');
     inputs.forEach(input => {
         const { level, prop } = input.dataset;
         DIFFICULTY_CONFIG[level][prop] = parseFloat(input.value);
     });
+
+    // Save to local
     localStorage.setItem('customDifficultyConfig', JSON.stringify(DIFFICULTY_CONFIG));
-    alert('밸런스 설정이 저장되었습니다.');
+
+    // Save to remote (Google Spreadsheet)
+    if (ADMIN_PASSWORD_URL !== 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') {
+        try {
+            await fetch(ADMIN_PASSWORD_URL, {
+                method: 'POST',
+                mode: 'no-cors', // Apps Script web app limitation with redirect
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ config: DIFFICULTY_CONFIG })
+            });
+            alert('로컬 및 서버(스프레드시트)에 설정이 저장되었습니다.\n(서버 반영은 1~2초 정도 소요될 수 있습니다.)');
+        } catch (error) {
+            console.error("Failed to save remote config:", error);
+            alert('서버 저장 중 오류가 발생했습니다. 로컬에는 저장되었습니다.');
+        }
+    } else {
+        alert('밸런스 설정이 로컬에 저장되었습니다.');
+    }
+
+    btnSaveBalance.disabled = false;
+    btnSaveBalance.textContent = '저장';
     balanceOverlay.classList.remove('active');
 });
 
