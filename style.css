@@ -247,7 +247,7 @@ body {
     top: 50%;
     background: #ffffff;
     color: #1e293b;
-    padding: 8px;
+    padding: 10px;
     border-radius: 8px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     display: flex;
@@ -255,7 +255,7 @@ body {
     align-items: center;
     justify-content: center;
     width: 120px;
-    height: 84px;
+    height: 168px;
     text-align: center;
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     overflow: hidden;
@@ -409,13 +409,13 @@ body {
 
 /* Item Visual/Label inside item-display */
 #item-visual {
-    font-size: 2.5rem;
-    margin-bottom: 2px;
+    font-size: 4rem;
+    margin-bottom: 5px;
 }
 
 #item-label {
     font-family: var(--font-heading);
-    font-size: 0.8rem;
+    font-size: 1.2rem;
     font-weight: 800;
     color: #334155;
 }
@@ -487,16 +487,19 @@ body {
 }
 
 .game-btn {
-    padding: 15px 40px;
+    padding: 20px 60px;
     font-family: var(--font-heading);
-    font-size: 1.2rem;
+    font-size: 1.8rem;
     font-weight: 700;
     border: none;
-    border-radius: 8px;
+    border-radius: 12px;
     cursor: pointer;
     transition: all 0.2s;
     text-transform: uppercase;
     position: relative;
+    touch-action: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
     /* For shortcut label */
 }
 
