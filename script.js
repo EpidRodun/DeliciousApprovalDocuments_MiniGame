@@ -10,7 +10,8 @@ let gameState = {
     isProcessing: false,
     isPaused: false,
     status: 'yes', // Current inspector state: 'yes' or 'no'
-    itemQueue: [] // Store 5 items
+    itemQueue: [], // Store 5 items
+    controlMode: 1 // 1: Swap/Approve, 2: Direct YES/NO
 };
 
 // DOM Elements
@@ -32,6 +33,7 @@ const btnApprove = document.getElementById('btn-approve');
 const btnSwap = document.getElementById('btn-swap');
 const btnPause = document.getElementById('btn-pause');
 const btnResume = document.getElementById('btn-resume');
+const btnPauseRestart = document.getElementById('btn-pause-restart');
 const btnDifficulty = document.getElementById('btn-difficulty');
 const settingsOverlay = document.getElementById('settings-overlay');
 const btnSaveSettings = document.getElementById('btn-save-settings');
@@ -43,6 +45,11 @@ const balanceTableBody = document.getElementById('balance-table-body');
 const btnSaveBalance = document.getElementById('btn-save-balance');
 const btnResetBalance = document.getElementById('btn-reset-balance');
 const btnCloseBalance = document.getElementById('btn-close-balance');
+
+const modeButtons = document.querySelectorAll('.mode-btn');
+const controlsFooter = document.getElementById('controls');
+const btnNoDirect = document.getElementById('btn-no-direct');
+const btnYesDirect = document.getElementById('btn-yes-direct');
 
 const passwordOverlay = document.getElementById('password-overlay');
 const adminPasswordInput = document.getElementById('admin-password');
@@ -92,6 +99,7 @@ const DEFAULT_DIFFICULTY_CONFIG = {
 let DIFFICULTY_CONFIG = JSON.parse(localStorage.getItem('customDifficultyConfig')) || { ...DEFAULT_DIFFICULTY_CONFIG };
 
 let currentDifficulty = localStorage.getItem('gameDifficulty') || 'normal';
+let currentControlMode = parseInt(localStorage.getItem('controlMode')) || 1;
 
 let itemElements = []; // Store DOM elements of the queue
 
@@ -123,6 +131,7 @@ btnDifficulty.addEventListener('click', () => {
     difficultyButtons.forEach(btn => {
         btn.classList.toggle('selected', btn.dataset.level === currentDifficulty);
     });
+    updateModeButtonsUI();
     settingsOverlay.classList.add('active');
 });
 
@@ -133,10 +142,31 @@ difficultyButtons.forEach(btn => {
     });
 });
 
+function updateModeButtonsUI() {
+    modeButtons.forEach(btn => {
+        btn.classList.toggle('selected', parseInt(btn.dataset.mode) === currentControlMode);
+    });
+}
+
+modeButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+        currentControlMode = parseInt(btn.dataset.mode);
+        updateModeButtonsUI();
+        localStorage.setItem('controlMode', currentControlMode);
+        updateControlUI();
+    });
+});
+
 btnSaveSettings.addEventListener('click', () => {
     localStorage.setItem('gameDifficulty', currentDifficulty);
     settingsOverlay.classList.remove('active');
 });
+
+function updateControlUI() {
+    controlsFooter.classList.remove('mode-1', 'mode-2');
+    controlsFooter.classList.add(`mode-${currentControlMode}`);
+    updateStatusUI();
+}
 
 // Balance Tuning Logic
 btnBalanceTuning.addEventListener('click', () => {
@@ -274,14 +304,39 @@ btnSwap.addEventListener('click', () => {
 });
 btnPause.addEventListener('click', () => togglePause());
 btnResume.addEventListener('click', () => togglePause());
+btnPauseRestart.addEventListener('click', () => {
+    if (confirm('게임을 다시 시작하시겠습니까?')) {
+        startGame();
+    }
+});
+
+btnNoDirect.addEventListener('click', () => {
+    if (gameState.isPaused || !gameState.gameActive) return;
+    handleApproveMode2('no');
+});
+
+btnYesDirect.addEventListener('click', () => {
+    if (gameState.isPaused || !gameState.gameActive) return;
+    handleApproveMode2('yes');
+});
 
 window.addEventListener('keydown', (e) => {
     if (!gameState.gameActive) return;
     if (e.key.toLowerCase() === 'p') togglePause();
     if (gameState.isPaused) return;
-    if (e.key.toLowerCase() === 'a') toggleStatus();
-    if (e.key.toLowerCase() === 's') {
-        if (!gameState.isProcessing) handleApprove();
+
+    if (currentControlMode === 1) {
+        if (e.key.toLowerCase() === 'a') toggleStatus();
+        if (e.key.toLowerCase() === 's') {
+            if (!gameState.isProcessing) handleApprove();
+        }
+    } else {
+        if (e.key.toLowerCase() === 'a') {
+            if (!gameState.isProcessing) handleApproveMode2('no');
+        }
+        if (e.key.toLowerCase() === 's') {
+            if (!gameState.isProcessing) handleApproveMode2('yes');
+        }
     }
 });
 
@@ -318,9 +373,12 @@ function startGame() {
         isProcessing: false,
         isPaused: false,
         status: 'yes',
-        itemQueue: []
+        itemQueue: [],
+        controlMode: currentControlMode
     };
 
+    updateControlUI();
+    updateModeButtonsUI();
     updateUI();
     updateStatusUI();
     startOverlay.classList.remove('active');
@@ -433,8 +491,13 @@ function toggleStatus() {
 }
 
 function updateStatusUI() {
-    icons.yes.classList.toggle('active', gameState.status === 'yes');
-    icons.no.classList.toggle('active', gameState.status === 'no');
+    if (currentControlMode === 1) {
+        icons.yes.parentElement.style.display = 'flex';
+        icons.yes.classList.toggle('active', gameState.status === 'yes');
+        icons.no.classList.toggle('active', gameState.status === 'no');
+    } else {
+        icons.yes.parentElement.style.display = 'none';
+    }
 }
 
 function handleApprove() {
@@ -470,12 +533,35 @@ function handleApprove() {
         return;
     }
 
+    processResult(result, activeEl, item);
+}
+
+function handleApproveMode2(choice) {
+    if (!gameState.gameActive || gameState.isProcessing) return;
+
+    const item = gameState.currentItem;
+    const activeEl = itemElements[0];
+    let result = 'none';
+
+    // Mode 2 logic: Direct comparison
+    if (item.type === 'bread') {
+        result = 'success_both';
+    } else {
+        if (choice === item.type) {
+            result = 'success_fever';
+        } else {
+            result = 'fail';
+        }
+    }
+
+    processResult(result, activeEl, item);
+}
+
+// Extract the result processing part from handleApprove to reuse it
+function processResult(result, activeEl, item) {
     gameState.isProcessing = true;
 
-    // Play sound effects could be added here
-
     if (result.startsWith('success')) {
-        // Correct Action
         triggerFlash('flash-correct');
         gameState.combo++;
         const points = 100 + (gameState.combo * 20);
@@ -492,7 +578,6 @@ function handleApprove() {
         if (result === 'success_both') gameState.time = Math.min(100, gameState.time + config.recoverBread);
         else gameState.time = Math.min(100, gameState.time + config.recover);
 
-        // Combo animation
         comboText.classList.remove('combo-animate');
         void comboText.offsetWidth;
         comboText.classList.add('combo-animate');
@@ -504,12 +589,10 @@ function handleApprove() {
             addPaperToStack();
         }
     } else {
-        // Wrong Action
         triggerFlash('flash-wrong');
         const config = DIFFICULTY_CONFIG[currentDifficulty];
         gameState.combo = 0;
         gameState.time -= config.penalty;
-        // Visual shake for container or camera
         activeEl.classList.add('item-tear');
     }
 
@@ -560,3 +643,7 @@ function endGame() {
     const startTitle = startOverlay.querySelector('h1');
     startTitle.textContent = "GAME OVER";
 }
+
+// Initial UI Setup
+updateControlUI();
+updateModeButtonsUI();

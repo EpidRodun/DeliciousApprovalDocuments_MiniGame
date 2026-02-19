@@ -535,6 +535,54 @@ body {
     box-shadow: none;
 }
 
+/* Control Mode Handling */
+#controls.mode-1 .mode2-only {
+    display: none;
+}
+
+#controls.mode-2 .mode1-only {
+    display: none;
+}
+
+.control-group {
+    display: flex;
+    justify-content: center;
+    gap: 400px;
+    width: 100%;
+}
+
+.setting-section {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--glass-border);
+}
+
+.setting-section h2 {
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.mode-btn {
+    flex: 1;
+    padding: 12px;
+    font-size: 1rem;
+    font-weight: 700;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.mode-btn.selected {
+    background: var(--accent-color);
+    color: white;
+    border-color: var(--accent-color);
+}
+
 /* Animations */
 @keyframes fever-glow {
     0% {

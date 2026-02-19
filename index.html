@@ -71,15 +71,29 @@
             </main>
 
             <!-- Controls -->
-            <footer id="controls">
-                <button id="btn-swap" class="game-btn swap">
-                    교체
-                    <span class="shortcut-hint">A</span>
-                </button>
-                <button id="btn-approve" class="game-btn approve">
-                    승인
-                    <span class="shortcut-hint">S</span>
-                </button>
+            <footer id="controls" class="mode-1">
+                <!-- Mode 1: Swap/Approve -->
+                <div class="control-group mode1-only">
+                    <button id="btn-swap" class="game-btn swap">
+                        교체
+                        <span class="shortcut-hint">A</span>
+                    </button>
+                    <button id="btn-approve" class="game-btn approve">
+                        승인
+                        <span class="shortcut-hint">S</span>
+                    </button>
+                </div>
+                <!-- Mode 2: Direct YES/NO -->
+                <div class="control-group mode2-only">
+                    <button id="btn-no-direct" class="game-btn reject">
+                        NO
+                        <span class="shortcut-hint">A</span>
+                    </button>
+                    <button id="btn-yes-direct" class="game-btn approve">
+                        YES
+                        <span class="shortcut-hint">S</span>
+                    </button>
+                </div>
             </footer>
 
         </div> <!-- End of game-wrapper -->
@@ -90,6 +104,13 @@
             <div class="overlay-content glass-panel">
                 <h1>맛있는 승인 서류</h1>
                 <p>기준에 맞는 식품만 승인하세요!</p>
+                <div class="setting-section">
+                    <h2>조작 모드 선택</h2>
+                    <div id="start-mode-options" class="btn-group horizontal">
+                        <button class="mode-btn mode-1" data-mode="1">모드 1 (교체/승인)</button>
+                        <button class="mode-btn mode-2" data-mode="2">모드 2 (YES/NO 직결)</button>
+                    </div>
+                </div>
                 <div class="btn-group">
                     <button id="btn-start" class="large-btn">게임 시작</button>
                     <button id="btn-difficulty" class="large-btn secondary">난이도 설정</button>
@@ -107,6 +128,7 @@
                     <button class="diff-btn" data-level="normal">보통</button>
                     <button class="diff-btn" data-level="hard">어려움</button>
                 </div>
+                <!-- Mode selection removed from here -->
                 <div class="btn-group">
                     <button id="btn-balance-tuning" class="large-btn secondary">밸런스 상세 조절</button>
                     <button id="btn-save-settings" class="large-btn">저장 및 나가기</button>
@@ -165,7 +187,17 @@
             <div class="overlay-content glass-panel">
                 <h1>일시정지</h1>
                 <p>잠시 숨을 고르세요.</p>
-                <button id="btn-resume" class="large-btn">계속하기</button>
+                <div class="setting-section">
+                    <h2>조작 모드 선택</h2>
+                    <div id="pause-mode-options" class="btn-group horizontal">
+                        <button class="mode-btn" data-mode="1">모드 1 (교체/승인)</button>
+                        <button class="mode-btn" data-mode="2">모드 2 (YES/NO 직결)</button>
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <button id="btn-resume" class="large-btn">계속하기</button>
+                    <button id="btn-pause-restart" class="large-btn secondary">다시 하기</button>
+                </div>
             </div>
         </div>
 
@@ -187,6 +219,13 @@
                 <h1>업무 종료</h1>
                 <p>최종 스코어</p>
                 <div id="final-score">000,000</div>
+                <div class="setting-section">
+                    <h2>조작 모드 선택</h2>
+                    <div id="gameover-mode-options" class="btn-group horizontal">
+                        <button class="mode-btn" data-mode="1">모드 1 (교체/승인)</button>
+                        <button class="mode-btn" data-mode="2">모드 2 (YES/NO 직결)</button>
+                    </div>
+                </div>
                 <button id="btn-restart" class="large-btn">다시 하기</button>
             </div>
         </div>
